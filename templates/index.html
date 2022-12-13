@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport"
+              content="width=device-width,
+                 initial-scale=1, shrink-to-fit=no">
+         
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="static/style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        
+    </head>
+
+    <body>
+
+        <!--Reference for editable table: https://codewithmark.com/easily-edit-html-table-rows-or-cells-with-jquery--> 
+        <!--Reference for uploading image file: https://roytuts.com/upload-and-display-image-using-python-flask/-->
+       
+       <script type="text/javascript">
+        $(document).ready(function($)
+        {
+            //ajax row data
+            var concepts = {{concepts|safe}}
+            var labels = {{labels|safe}}
+
+            var random_id = function  () 
+            {
+                var id_num = Math.random().toString(9).substr(2,3);
+                var id_str = Math.random().toString(36).substr(2);
+                
+                return id_num + id_str;
+            }
+
+            //table for concept values and probability
+            //--->create data table > start
+            var tbl = '';
+            tbl +='<table class="table table-hover" id="table1" >';
+
+                //--->create table header > start
+                tbl +='<thead>';
+                    tbl +='<tr>';
+                    tbl +='<th>Concept</th>';
+                    tbl +='<th>Probability</th>';
+                    tbl +='</tr>';
+                tbl +='</thead>';
+                //--->create table header > end
+
+                
+                //--->create table body > start
+                tbl +='<tbody>';
+
+                    //--->create table body rows > start
+                    $.each(concepts, function(index, val) 
+                    {
+                        //you can replace with your database row id
+                        var row_id = val['id'];
+
+                        //loop through ajax row data
+                        tbl +='<tr row_id="'+row_id+'">';
+                            tbl +='<td ><div class="row_data" edit_type="click" col_name="fname">'+val['concept']+'</div></td>';
+                            tbl +='<td ><div class="row_data" edit_type="click" col_name="lname">'+val['probability']+'</div></td>';
+                        tbl +='</tr>';
+                    });
+
+                    //--->create table body rows > end
+                //--->create table body > end
+
+            tbl +='</table>';
+            
+            // Table for labels and probabilitites
+            var tbl2 = '';
+            tbl2 +='<table class="table table-hover" id="table2">'
+
+                //--->create table header > start
+                tbl2 +='<thead>';
+                    tbl2 +='<tr>';
+                    tbl2 +='<th>Species</th>';
+                    tbl2 +='<th>Probability</th>';
+                    tbl2 +='</tr>';
+                tbl2 +='</thead>';
+                //--->create table header > end
+
+                
+                //--->create table body > start
+                tbl2 +='<tbody>';
+
+                    //--->create table body rows > start
+                    $.each(labels, function(index, val) 
+                    {
+                        //you can replace with your database row id
+                        var row_id = random_id();
+
+                        //loop through ajax row data
+                        tbl2 +='<tr row_id="'+row_id+'">';
+                            tbl2 +='<td ><div class="row_data" edit_type="click" col_name="fname">'+val['label']+'</div></td>';
+                            tbl2 +='<td ><div class="row_data" edit_type="click" col_name="lname">'+val['probability']+'</div></td>';
+                        tbl2 +='</tr>';
+                    });
+
+                    //--->create table body rows > end
+
+                tbl2 +='</tbody>';
+                //--->create table body > end
+
+            tbl2 +='</table>'
+            //--->create data table > end
+            
+            // Pagination for table1
+            $(document).ready(function(){
+                $('#table1').after('<div id="nav1"></div>');
+                var rowsShown = 10;
+                var rowsTotal = $('#table1 tbody tr').length;
+                var numPages = rowsTotal/rowsShown;
+                for(i = 0;i < numPages;i++) {
+                    var pageNum = i + 1;
+                    $('#nav1').append('<a href="#" rel="'+i+'">'+pageNum+'</a> ');
+                }
+                $('#table1 tbody tr').hide();
+                $('#table1 tbody tr').slice(0, rowsShown).show();
+                $('#nav1 a:first').addClass('active');
+                $('#nav1 a').bind('click', function(){
+
+                    $('#nav1 a').removeClass('active');
+                    $(this).addClass('active');
+                    var currPage = $(this).attr('rel');
+                    var startItem = currPage * rowsShown;
+                    var endItem = startItem + rowsShown;
+                    $('#table1 tbody tr').css('opacity','0.0').hide().slice(startItem, endItem).
+                            css('display','table-row').animate({opacity:1}, 300);
+                });
+            });
+
+            // pagination for table 2
+            $(document).ready(function(){
+                $('#table2').after('<div id="nav2"></div>');
+                var rowsShown = 10;
+                var rowsTotal = $('#table2 tbody tr').length;
+                var numPages = rowsTotal/rowsShown;
+                for(i = 0;i < numPages;i++) {
+                    var pageNum = i + 1;
+                    $('#nav2').append('<a href="#" rel="'+i+'">'+pageNum+'</a> ');
+                }
+                $('#table2 tbody tr').hide();
+                $('#table2 tbody tr').slice(0, rowsShown).show();
+                $('#nav2 a:first').addClass('active');
+                $('#nav2 a').bind('click', function(){
+
+                    $('#nav2 a').removeClass('active');
+                    $(this).addClass('active');
+                    var currPage = $(this).attr('rel');
+                    var startItem = currPage * rowsShown;
+                    var endItem = startItem + rowsShown;
+                    $('#table2 tbody tr').css('opacity','0.0').hide().slice(startItem, endItem).
+                            css('display','table-row').animate({opacity:1}, 300);
+                });
+            });
+
+            //out put table data
+            $(document).find('.tbl_user_data').html(tbl);
+            $(document).find('.tbl_class_prob').html(tbl2);
+            
+
+
+            //--->make div editable > start
+            $(document).on('click', '.row_data', function(event) 
+            {
+                event.preventDefault(); 
+
+                if($(this).attr('edit_type') == 'button')
+                {
+                    return false; 
+                }
+
+                //make div editable
+                $(this).closest('div').attr('contenteditable', 'true');
+                //add bg css
+                $(this).addClass('bg-warning').css('padding','5px');
+
+                $(this).focus();
+            })	
+            //--->make div editable > end
+
+
+            //--->save single field data > start
+            $(document).on('focusout', '.row_data', function(event) 
+            {
+                event.preventDefault();
+
+                if($(this).attr('edit_type') == 'button')
+                {
+                    return false; 
+                }
+
+                var row_id = $(this).closest('tr').attr('row_id'); 
+                
+                var row_div = $(this)				
+                .removeClass('bg-warning') //add bg css
+                .css('padding','')
+
+                var col_name = row_div.attr('col_name'); 
+                var col_val = row_div.html(); 
+
+                var arr = {};
+                arr[col_name] = col_val;
+
+                //use the "arr"	object for your ajax call
+                $.extend(arr, {row_id:row_id});
+                console.log(concepts)
+                let json_ajax_data = concepts
+                var foundIndex = json_ajax_data.findIndex(x => x.id == arr['row_id']);
+                
+                var item = json_ajax_data[foundIndex]
+                item.probability = arr['lname']
+                json_ajax_data[foundIndex] = item
+
+                for(let i = 0; i < json_ajax_data.length; i++) {
+                    let obj = json_ajax_data[i];
+                    console.log(obj.concept + ", " + obj.probability);
+                }       
+
+                document.forms.rerun.features.value=JSON.stringify(json_ajax_data)
+                
+                //out put to show
+                $('.post_msg').html( '<pre class="bg-success">'+JSON.stringify(arr, null, 2) +'</pre>');
+                
+            })	
+            //--->save single field data > end
+
+        }); 
+
+        </script>
+
+        <h2>Select a file to upload</h2>
+        <p>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+        </p>
+        {% if filename %}
+            <div>
+                <img src="{{ url_for('display_image', filename=filename) }}">
+            </div>
+        {% endif %}
+        <form method="post" action="/" enctype="multipart/form-data">
+            <dl>
+                <p>
+                    <input type="file" name="file" autocomplete="off" required>
+                </p>
+            </dl>
+            <p>
+                <input type="submit" id="submit_button" class="input_button" value="Submit">
+            </p>
+        </form>
+                
+
+        <div class="panel panel-default">
+        <div class="panel-heading"><h3> Prediction results </h3> </div>
+
+        <div class="panel-body">
+            {% if concepts %}
+            <div class="tbl_user_data"></div>
+            <div class="tbl_class_prob"></div>
+            {% endif %}
+
+        </div>
+        </div>
+        <form method="post" action="/rerun" name="rerun" method="POST">
+            <input type='text' name="features" id="features" value="" style="display:none" required>
+            <input type="submit" value="Rerun" id="rerun_submit" class="input_button">
+        </form>
+
+
+    </body>
+</html>
